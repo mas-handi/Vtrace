@@ -30,6 +30,7 @@ const preProcessMainCanvas = (
   width,
   height,
 ) => {
+  // Step 1: Draw image with CSS filters (brightness, contrast, etc.)
   ctxOffscreen.clearRect(0, 0, width, height);
   ctxOffscreen.setTransform(1, 0, 0, 1, width / 2, height / 2);
   ctxOffscreen.rotate((rotate * Math.PI) / 180);
@@ -40,6 +41,7 @@ const preProcessMainCanvas = (
     -inputImageBitmap.height / 2,
   );
   ctxOffscreen.setTransform(1, 0, 0, 1, 0, 0);
+  // Step 3: Apply posterize filter
   ctxOffscreen.filter = filter;
   ctxOffscreen.drawImage(
     offscreen,

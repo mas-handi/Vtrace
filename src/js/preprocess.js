@@ -139,12 +139,7 @@ if (supportsOffscreenCanvas) {
       (-factor * inputImage.naturalWidth * shrinkFactor) / 2,
       (-factor * inputImage.naturalHeight * shrinkFactor) / 2,
     );
-    const imgData = ctxMain.getImageData(
-      0,
-      0,
-      canvasMain.width,
-      canvasMain.height,
-    );
+    const imgData = ctxMain.getImageData(0, 0, width, height);
     const redSteps = filterInputs[COLORS.red].value;
     const greenSteps = filterInputs[COLORS.green].value;
     const blueSteps = filterInputs[COLORS.blue].value;
@@ -170,10 +165,18 @@ if (supportsOffscreenCanvas) {
 
 const getScaledDimensions = () => {
   const scaleFactor = Number(filterInputs[SCALE_ROTATION.scale].value) / 100;
-  return {
-    width: Math.ceil(dpr * inputImage.naturalWidth * scaleFactor),
-    height: Math.ceil(dpr * inputImage.naturalHeight * scaleFactor),
-  };
+  let width = Math.ceil(dpr * inputImage.naturalWidth * scaleFactor);
+  let height = Math.ceil(dpr * inputImage.naturalHeight * scaleFactor);
+  // Auto-upscale images for smoother vector tracing.
+  // More pixels at edges gives Potrace better boundary data for smooth curves.
+  const maxDim = Math.max(width, height);
+  const MIN_TRACE_SIZE = 3000;
+  if (maxDim > 0 && maxDim < MIN_TRACE_SIZE) {
+    const autoScale = MIN_TRACE_SIZE / maxDim;
+    width = Math.ceil(width * autoScale);
+    height = Math.ceil(height * autoScale);
+  }
+  return { width, height };
 };
 
 const getRange = (input) => {
